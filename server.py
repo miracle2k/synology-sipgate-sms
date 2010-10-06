@@ -48,6 +48,12 @@ def app(environ, start_response):
     """The URL we receive must look something like this:
 
     http://localhost:10288/?user=FOO&password=BAR&to=12345&text=Hello+World
+
+    Note: The Synology Admin GUI validates the SMS provider URI, and in
+    particular, expects the "text" parameter to have a certain format that
+    I can't quite grasp and doesn't seem to be documented anywhere - some
+    strings just seem to work, other not. "Hello+World", as in the example,
+    does work.
     """
     request = Request(environ)
     if request.path != '/':
