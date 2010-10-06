@@ -36,6 +36,6 @@ class SipgateAPI(object):
 			if not recipient_number.isdigit():
 				raise SanityCheckError('Recipient number must be a string of digits.')
 
-		print self.sg.samurai.SessionInitiate({'RemoteUri': PHONE_TO_SIP_TEMPLATE % recipient_number,
+		self.sg.samurai.SessionInitiate({'RemoteUri': PHONE_TO_SIP_TEMPLATE % recipient_number,
 		                              'TOS': 'text',
 		                              'Content': str(text)})
