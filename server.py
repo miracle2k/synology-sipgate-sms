@@ -21,12 +21,17 @@ import xmlrpclib
 
 def send_sms(request):
     try:
-        user = request.args['user']
-        password = request.args['password']
-        number = request.args['to']
-        message = request.args['text']
+        user = request.args['user'].strip()
+        password = request.args['password'].strip()
+        number = request.args['to'].strip()
+        message = request.args['text'].strip()
     except KeyError:
         raise BadRequest("Missing url parameter")
+
+    # Prepare some of the values
+    if number[:1] == '+':
+        number = number[2:]
+
 
     api = sipgateapi.SipgateAPI(user, password)
     try:
