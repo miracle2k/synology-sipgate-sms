@@ -17,7 +17,7 @@ we install it first::
 
     $ ipkg python27
 
-If you don't have ``ipkg`` install yet, see:
+If you don't have ``ipkg`` installed yet, see:
 http://forum.synology.com/wiki/index.php/Overview_on_modifying_the_Synology_Server,_bootstrap,_ipkg_etc#How_to_install_ipkg
 
 Let's install the tarball::
