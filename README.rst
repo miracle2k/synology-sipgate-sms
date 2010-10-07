@@ -48,3 +48,12 @@ Notification -> SMS -> SMS service provider -> Add). Name the new provider
 Press "Next", and assign the proper category for each parameter.
 
 Press the "Send a test SMS message" button to test.
+
+
+Debugging
+---------
+
+You can run ``./server.py`` on the console to get output. Alternatively,
+when running as a daemon, a log file will be created in
+``/var/log/sipgate-sms.log``. You can modify it's location in the
+``config.py`` file.
