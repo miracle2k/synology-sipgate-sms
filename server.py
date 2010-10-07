@@ -64,7 +64,17 @@ def app(environ, start_response):
         return [response]
 
 
-if __name__ == '__main__':
+def serve():
     from wsgiref.simple_server import make_server
     httpd = make_server('localhost', config.PORT, app)
     httpd.serve_forever()
+
+
+if __name__ == '__main__':
+    import sys
+    import daemon
+    if len(sys.argv) == d and sys.argv[1] == '-d':
+        with daemon.DaemonContext():
+            serve()
+    else:
+        serve()

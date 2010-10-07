@@ -5,7 +5,7 @@ SCRIPT=/opt/local/sipgate-sms/server.py
 case "$1" in
     start)
         echo "Starting sipgate-sms bridge."
-	     [ -x $SCRIPT ] && $SCRIPT &
+	     [ -x $SCRIPT ] && $SCRIPT -d
     ;;
     *)
         echo "Usage: $0 {start}"
