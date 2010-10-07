@@ -1,3 +1,0 @@
-[submodule "werkzeug"]
-	path = werkzeug
-	url = http://github.com/clones/werkzeug.git

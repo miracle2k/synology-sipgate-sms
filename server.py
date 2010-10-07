@@ -1,47 +1,42 @@
 #!/usr/bin/env python
 
-# Werkzeug is in a submodule, we don't need to bother about
-# installing it separately on the NAS.
-import sys
-from os.path import join, dirname
-sys.path.insert(0, join(dirname(__file__), 'werkzeug'))
-
-
 try:
     import config
 except ImportError:
     raise RuntimeError("no config")
 
 
-from werkzeug import Request, Response
-from werkzeug.exceptions import BadRequest, NotFound
+from urlparse import parse_qsl
 import sipgateapi
 import xmlrpclib
 
 
-def send_sms(request):
+class BadRequest(Exception):
+    pass
+
+
+def send_sms(params, environ):
     try:
-        user = request.args['user'].strip()
-        password = request.args['password'].strip()
-        number = request.args['to'].strip()
-        message = request.args['text'].strip()
-    except KeyError:
-        raise BadRequest("Missing url parameter")
+        user = params['user'].strip()
+        password = params['password'].strip()
+        number = params['to'].strip()
+        message = params['text'].strip()
+    except KeyError, e:
+        raise BadRequest("Missing url parameter: %s" % e)
 
     # Prepare some of the values
     if number[:1] == '+':
         number = number[2:]
 
-
-    api = sipgateapi.SipgateAPI(user, password)
     try:
+        api = sipgateapi.SipgateAPI(user, password)
         api.send_sms(number, message)
     except sipgateapi.SanityCheckError, e:
         raise BadRequest('API call not sane: %s' % e)
     except xmlrpclib.ProtocolError, e:
         raise BadRequest('API call error: %s' % e)
     else:
-        return Response('ok')
+        return 'ok'
 
 
 def app(environ, start_response):
@@ -55,27 +50,21 @@ def app(environ, start_response):
     strings just seem to work, other not. "Hello+World", as in the example,
     does work.
     """
-    request = Request(environ)
-    if request.path != '/':
-        raise NotFound()
+    if environ.get('PATH_INFO', '').lstrip('/').rstrip('/') != '':
+        start_response('200 OK', [('Content-type', 'text/plain')])
+        return ['error 404']
 
     try:
-        return send_sms(request)(environ, start_response)
-    except Exception, e:
-        print e
-        raise
+        response = send_sms(dict(parse_qsl(environ['QUERY_STRING'])), environ)
+    except BadRequest, e:
+        start_response('400 Bad Request', [('Content-type', 'text/plain')])
+        return ['%s' % e]
+    else:
+        start_response('200 Ok', [('Content-type', 'text/plain')])
+        return [response]
 
 
 if __name__ == '__main__':
-    from werkzeug.serving import run_simple
-    run_simple('localhost', config.PORT, app,
-               use_reloader=False,
-               use_debugger=False,
-               use_evalex=False,
-               extra_files=None,
-               reloader_interval=1,
-               threaded=False,
-               processes=1,
-               request_handler=None,
-               static_files=None,
-               passthrough_errors=False,)
+    from wsgiref.simple_server import make_server
+    httpd = make_server('localhost', config.PORT, app)
+    httpd.serve_forever()
