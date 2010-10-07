@@ -6,6 +6,7 @@ except ImportError:
     raise RuntimeError("no config")
 
 
+import logging
 from urlparse import parse_qsl
 import sipgateapi
 import xmlrpclib
@@ -13,6 +14,9 @@ import xmlrpclib
 
 class BadRequest(Exception):
     pass
+
+
+logger = logging.getLogger('sipgate-sms')
 
 
 def send_sms(params, environ):
@@ -23,6 +27,8 @@ def send_sms(params, environ):
         message = params['text'].strip()
     except KeyError, e:
         raise BadRequest("Missing url parameter: %s" % e)
+
+    logger.info('Request: user=%s, to=%s, message=%s' % (user, number, message))
 
     # Prepare some of the values
     if number[:1] == '+':
@@ -57,9 +63,14 @@ def app(environ, start_response):
     try:
         response = send_sms(dict(parse_qsl(environ['QUERY_STRING'])), environ)
     except BadRequest, e:
+        logger.error('Error: %s' % e)
         start_response('400 Bad Request', [('Content-type', 'text/plain')])
         return ['%s' % e]
+    except Exception, e:
+        logger.error('Error: %s' % e)
+        raise
     else:
+        logger.info('Success')
         start_response('200 Ok', [('Content-type', 'text/plain')])
         return [response]
 
@@ -73,8 +84,19 @@ def serve():
 if __name__ == '__main__':
     import sys
     import daemon
-    if len(sys.argv) == d and sys.argv[1] == '-d':
-        with daemon.DaemonContext():
+
+    logger.setLevel(logging.INFO)
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
+    if len(sys.argv) == 2 and sys.argv[1] == '-d':
+        handler = logging.FileHandler(config.LOGFILE)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        with daemon.DaemonContext(files_preserve=[handler.stream]):
             serve()
     else:
+        handler = logging.StreamHandler(sys.stderr)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
         serve()
