@@ -1,0 +1,15 @@
+#! /bin/sh
+
+SCRIPT=/opt/local/sipgate-sms/server.py
+
+case "$1" in
+    start)
+        echo "Starting sipgate-sms bridge."
+	     [ -x $SCRIPT ] && $SCRIPT &
+    ;;
+    *)
+        echo "Usage: $0 {start}"
+        exit 1
+esac
+
+exit 0
