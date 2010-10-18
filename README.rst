@@ -33,11 +33,11 @@ Create the configuration file (no need to change it, normally)::
 
 Enable the daemon to autostart::
 
-    $ cp /opt/local/sipgate-sms/initd-script /opt/etc/init.d/sipgate-sms
+    $ cp /opt/local/sipgate-sms/initd-script /opt/etc/init.d/S10sipgate-sms
 
 Start the daemon::
 
-    $ /opt/etc/init.d/sipgate-sms start
+    $ /opt/etc/init.d/S10sipgate-sms start
 
 Now, in the Synology Admin GUI, setup the SMS provider (Control Panel ->
 Notification -> SMS -> SMS service provider -> Add). Name the new provider
