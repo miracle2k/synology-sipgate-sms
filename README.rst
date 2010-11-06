@@ -15,7 +15,7 @@ Installation
 This script is written in Python, which isn't installed by default, so
 we install it first::
 
-    $ ipkg python27
+    $ ipkg install python27
 
 If you don't have ``ipkg`` installed yet, see:
 http://forum.synology.com/wiki/index.php/Overview_on_modifying_the_Synology_Server,_bootstrap,_ipkg_etc#How_to_install_ipkg
