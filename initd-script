@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 
 # This would otherwise be set in a user's .profile and
 # thus not be available during the boot process, causing
